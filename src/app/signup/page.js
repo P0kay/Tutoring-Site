@@ -1,21 +1,119 @@
-import { neon } from '@neondatabase/serverless';
-import { v4 as uuidv4 } from 'uuid';
+'use client';
+
+import { useState } from "react";
 
 function SignUp() {
-    async function create(formData) {
-        'use server';
-        // Connect to the Neon database
-        const sql = neon(`${process.env.DATABASE_URL}`);
-        const comment = formData.get('comment');
-        // Insert the comment from the form into the Postgres database
-        await sql.query('INSERT INTO "user" VALUES ($1,$2,$3,$4)', [uuidv4(),"email",'password','type']);
+    const [error, setError] = useState(null)
+
+    async function handleSubmit(e) {
+        setError(null)
+        e.preventDefault();
+        const form = e.target;
+        const email = form.email.value;
+        const password = form.password.value;
+        const passwordConfirm = form.passwordConfirm.value;
+        const type = form.type.value;
+        const birth_date = form.birth_date.value;
+        if (password !== passwordConfirm) {
+            setError('Passwords do not match');
+            return;
+        }
+
+        const res = await fetch('/api/auth/signup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email,
+                password,
+                type,
+                birth_date,
+            }),
+        });
+        if (res.status === 409) {
+            setError('Email already exists');
+            return;
+        }
+
+        if (!res.ok) {
+            // If your API returns { message }, show it; otherwise a generic error
+            let msg = 'Sign in failed';
+            try {
+                const data = await res.json();
+                if (data?.message) msg = data.message;
+            } catch { }
+            setError(msg);
+            return;
+        }
+        form.reset();
+        window.location.href = '/signed-up';
     }
     return (
-        <form action={create}>
-            <input type="text" placeholder="write a comment" name="comment" />
-            <button type="submit">Submit</button>
-        </form>
+        <div className="h-min w-[20%] rounded-xl shadow-xl">
+            <form
+                onSubmit={handleSubmit}
+                className="flex flex-col gap-4 w-full max-w-sm bg-white p-6 rounded-2xl shadow-md"
+            >
+                <h1 className="text-2xl font-semibold text-center text-gray-800">
+                    Create account
+                </h1>
+
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="Email"
+                    required
+                    className="rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Password"
+                    required
+                    className="rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+
+                <input
+                    type="password"
+                    name="passwordConfirm"
+                    placeholder="Repeat password"
+                    required
+                    className="rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <div className="flex flex-col gap-1">
+                    <label className="text-sm text-gray-600">Account type</label>
+                    <select
+                        name="type"
+                        required
+                        className="rounded-lg border border-gray-300 px-4 py-2 bg-white focus:ring-2 focus:ring-blue-500"
+                    >
+                        <option value="">Select type</option>
+                        <option value="student">Student</option>
+                        <option value="tutor">Tutor</option>
+                    </select>
+                </div>
+                <div className="flex flex-col gap-1">
+                    <label className="text-sm text-gray-600">Birth date</label>
+                    <input
+                        type="date"
+                        name="birth_date"
+                        required
+                        className="rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
+                {error && <p className="text-sm text-red-500">{error}</p>}
+
+                <button
+                    type="submit"
+                    className="mt-2 rounded-lg bg-blue-600 py-2 text-white font-medium hover:bg-blue-700 transition"
+                >
+                    Sign up
+                </button>
+            </form>
+        </div>
     );
 }
 
-export default SignUp;``
+export default SignUp;
