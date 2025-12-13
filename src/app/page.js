@@ -1,11 +1,26 @@
 import Subject from "./components/subject";
 
 export default function Home() {
-  const SUBJECTS = ["CHEMIA", "MATEMATYKA", "ANGIELSKI", "BIOLOGIA", "FIZYKA", "POLSKI", "HISTORIA", "INFORMATYKA", "GEOGRAFIA"]
+  const SUBJECTS = [
+    { label: "CHEMIA", slug: "chemia" },
+    { label: "MATEMATYKA", slug: "matematyka" },
+    { label: "ANGIELSKI", slug: "angielski" },
+    { label: "BIOLOGIA", slug: "biologia" },
+    { label: "FIZYKA", slug: "fizyka" },
+    { label: "POLSKI", slug: "polski" },
+    { label: "HISTORIA", slug: "historia" },
+    { label: "INFORMATYKA", slug: "informatyka" },
+    { label: "GEOGRAFIA", slug: "geografia" },
+  ];
+
   return (
     <>
       {SUBJECTS.map(subject =>
-        <Subject subject_name={subject} key={subject} />
+        
+         <Subject key={subject.slug} 
+         subject_name={subject.label} 
+         href={`/${subject.slug}`} />
+        
       )}
     </>
   );
