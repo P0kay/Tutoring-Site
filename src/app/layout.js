@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono, Lilita_One } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
+import { getCurrentUser } from '@/app/lib/auth';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,22 +23,36 @@ const lilita = Lilita_One({
   variable: "--font-lilita-one",
 });
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const user = await getCurrentUser();
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <header className="flex justify-end gap-8 p-8">
-          <Link href='/admin-panel' className="border-2 w-25 h-10 rounded-lg flex justify-center items-center">
-            Admin Panel
-          </Link>
-          <Link href='/signin' className="border-2 w-20 h-10 rounded-lg flex justify-center items-center">
-            Sign In
-          </Link>
-          <Link href='/signup' className="border-2 w-20 h-10 rounded-lg flex justify-center items-center">
-            Sign Up
-          </Link>
+          {user ?
+            <>
+              {user.type === 'admin' &&
+                <Link href='/admin-panel' className="border-2 w-25 h-10 rounded-lg flex justify-center items-center cursor-pointer transition-colors duration-200 hover:bg-amber-300 hover:border-amber-400">
+                  Admin Panel
+                </Link>
+              }
+              <form action="/api/auth/signout" method="POST">
+                <button className="border-2 w-20 h-10 rounded-lg flex justify-center items-center cursor-pointer transition-colors duration-200 hover:bg-red-300 hover:border-red-400">
+                  Sign out
+                </button>
+              </form>
+            </> :
+            <>
+              <Link href='/signin' className="border-2 w-20 h-10 rounded-lg flex justify-center items-center cursor-pointer transition-colors duration-200 hover:bg-blue-300 hover:border-blue-400">
+                Sign In
+              </Link>
+              <Link href='/signup' className="border-2 w-20 h-10 rounded-lg flex justify-center items-center cursor-pointer transition-colors duration-200 hover:bg-blue-300 hover:border-blue-400">
+                Sign Up
+              </Link>
+            </>
+          }
         </header>
         <main className="flex gap-16 p-16 flex-wrap justify-center">
           {children}

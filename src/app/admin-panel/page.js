@@ -1,12 +1,26 @@
-import { headers } from 'next/headers';
 import { getSql } from '@/app/lib/db';
 import { revalidatePath } from 'next/cache';
+import { getCurrentUser } from '../lib/auth';
 
 async function AdminPanel() {
-    const h = await headers();
-    const host = h.get('host');
-    const proto = h.get('x-forwarded-proto') || 'http';
-
+    const user = await getCurrentUser()
+    if (!user || user.type !== 'admin') {
+        return (
+            <div className="flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                    <h1 className="text-5xl font-semibold text-gray-800 mb-4">
+                        403
+                    </h1>
+                    <p className="text-xl text-gray-600 mb-2">
+                        Forbidden
+                    </p>
+                    <p className="text-sm text-gray-500">
+                        Admin access only
+                    </p>
+                </div>
+            </div>
+        )
+    }
     const sql = getSql();
     const users = await sql.query(`
       SELECT
@@ -25,7 +39,15 @@ async function AdminPanel() {
     async function approveUser(formData) {
         'use server';
 
+        const user = await getCurrentUser();
+        if (!user || user.type !== 'admin') {
+            throw new Error('Forbidden');
+        }
+
         const uuid = formData.get('uuid');
+        if (!uuid || typeof uuid !== 'string') {
+            throw new Error('Invalid uuid');
+        }
         const sql = getSql();
 
         await sql.query(
