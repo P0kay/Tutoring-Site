@@ -8,7 +8,6 @@ export async function getCurrentUser() {
 
   const sql = getSql();
 
-  // If you store sessions.uuid as UUID, cast $1::uuid
   const rows = await sql.query(
     `
     SELECT u.uuid, u.email, u.type

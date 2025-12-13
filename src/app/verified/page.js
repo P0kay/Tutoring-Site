@@ -4,6 +4,8 @@ function Verified() {
     return (
         <div className="flex items-center justify-center bg-gray-50">
             <div className="bg-white p-8 rounded-2xl shadow-md text-center flex flex-col gap-6 max-w-sm w-full">
+                <div className="text-5xl">✅</div>
+
                 <h1 className="text-2xl font-semibold text-gray-800">
                     Email verified
                 </h1>

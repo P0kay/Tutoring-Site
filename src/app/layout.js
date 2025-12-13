@@ -43,6 +43,9 @@ export default async function RootLayout({ children }) {
                   Sign out
                 </button>
               </form>
+              <Link href='/my-profile' className="border-2 w-25 h-10 rounded-lg flex justify-center items-center cursor-pointer transition-colors duration-200 hover:bg-blue-300 hover:border-blue-400">
+                My profile
+              </Link>
             </> :
             <>
               <Link href='/signin' className="border-2 w-20 h-10 rounded-lg flex justify-center items-center cursor-pointer transition-colors duration-200 hover:bg-blue-300 hover:border-blue-400">
@@ -54,7 +57,7 @@ export default async function RootLayout({ children }) {
             </>
           }
         </header>
-        <main className="flex gap-16 p-16 flex-wrap justify-center">
+        <main className="flex justify-center">
           {children}
         </main>
       </body>
