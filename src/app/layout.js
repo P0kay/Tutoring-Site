@@ -39,6 +39,11 @@ export default function RootLayout({ children }) {
             Sign Up
           </Link>
         </header>
+        <header className="flex justify-betweenitem center absolute top-8 left-8" >
+          <Link href='/' className="border-2 w-20 h-10 rounded-lg flex justify-center items-center">
+            Main Page
+          </Link>
+        </header>
         <main className="flex gap-16 p-16 flex-wrap justify-center">
           {children}
         </main>
