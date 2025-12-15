@@ -37,7 +37,7 @@ async function MyProfile() {
                         <div>
                             <h2 className="text-lg font-semibold text-gray-900">Profile details</h2>
                             <p className="mt-1 text-sm text-gray-500">
-                                Fields below are editable (UI only for now).
+                                Fields below are editable.
                             </p>
                         </div>
 
