@@ -57,6 +57,9 @@ export default async function RootLayout({ children }) {
               </Link>
             </>
           }
+          <Link href='/' className="border-2 w-20 h-10 rounded-lg flex justify-center items-center">
+            Main Page
+          </Link>
         </header>
         <main className="flex justify-center">
           {children}
