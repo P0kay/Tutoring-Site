@@ -50,7 +50,7 @@ function SignUp() {
         window.location.href = '/signed-up';
     }
     return (
-        <div className="h-min w-[20%] rounded-xl shadow-xl">
+        <div className="h-min rounded-xl shadow-xl">
             <form
                 onSubmit={handleSubmit}
                 className="flex flex-col gap-4 w-full max-w-sm bg-white p-6 rounded-2xl shadow-md"
