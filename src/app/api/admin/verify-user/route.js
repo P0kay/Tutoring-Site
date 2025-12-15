@@ -12,7 +12,7 @@ export async function PATCH(req) {
         }
         const { uuid } = await req.json();
         const sql = getSql();
-        const result = await sql.query(`
+        await sql.query(`
         UPDATE users
         SET approved_at = NOW()
         WHERE uuid = $1;

@@ -31,6 +31,7 @@ export default async function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <header className="flex justify-end gap-8 p-8">
+          <Link href='/tutor-panel' className="border-2 w-25 h-10 rounded-lg flex justify-center items-center cursor-pointer transition-colors duration-200 hover:bg-green-300 hover:border-green-400">Tutor Panel</Link>
           {user ?
             <>
               {user.type === 'admin' &&
