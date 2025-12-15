@@ -9,6 +9,7 @@ const SUBJECT_DATA = {
       hs_ext: ["Stechiometria", "Równowaga", "Kinetyka"],
     },
   },
+
   matematyka: {
     title: "MATEMATYKA",
     topicsBySchoolType: {
@@ -17,6 +18,7 @@ const SUBJECT_DATA = {
       hs_ext: ["Granice", "Pochodne", "Całki"],
     },
   },
+
   geografia: {
     title: "GEOGRAFIA",
     topicsBySchoolType: {
@@ -25,7 +27,62 @@ const SUBJECT_DATA = {
       hs_ext: ["Geopolityka", "Globalizacja", "Rozwój"],
     },
   },
+
+  jezyk_angielski: {
+    title: "JĘZYK ANGIELSKI",
+    topicsBySchoolType: {
+      primary: ["Podstawowe słownictwo", "Czasy Present", "Dialogi"],
+      hs_base: ["Czasy gramatyczne", "Strona bierna", "Mowa zależna"],
+      hs_ext: ["Idiomy", "Writing", "Advanced grammar"],
+    },
+  },
+
+  biologia: {
+    title: "BIOLOGIA",
+    topicsBySchoolType: {
+      primary: ["Komórka", "Rośliny", "Zwierzęta"],
+      hs_base: ["Układy narządów", "Genetyka", "Ekologia"],
+      hs_ext: ["Biologia molekularna", "Ewolucja", "Biotechnologia"],
+    },
+  },
+
+  fizyka: {
+    title: "FIZYKA",
+    topicsBySchoolType: {
+      primary: ["Ruch", "Siły", "Energia"],
+      hs_base: ["Kinematyka", "Dynamika", "Elektryczność"],
+      hs_ext: ["Fale", "Optyka", "Fizyka jądrowa"],
+    },
+  },
+
+  jezyk_polski: {
+    title: "JĘZYK POLSKI",
+    topicsBySchoolType: {
+      primary: ["Części mowy", "Lektury", "Pisanie opowiadań"],
+      hs_base: ["Epoki literackie", "Środki stylistyczne", "Rozprawka"],
+      hs_ext: ["Analiza tekstu", "Interpretacja", "Historia literatury"],
+    },
+  },
+
+  historia: {
+    title: "HISTORIA",
+    topicsBySchoolType: {
+      primary: ["Starożytność", "Średniowiecze", "Nowożytność"],
+      hs_base: ["XIX wiek", "I wojna światowa", "II wojna światowa"],
+      hs_ext: ["Historia najnowsza", "Totalitaryzmy", "Integracja europejska"],
+    },
+  },
+
+  informatyka: {
+    title: "INFORMATYKA",
+    topicsBySchoolType: {
+      primary: ["Podstawy komputera", "Bezpieczeństwo", "Algorytmy"],
+      hs_base: ["Programowanie", "Bazy danych", "Sieci komputerowe"],
+      hs_ext: ["Struktury danych", "Algorytmy zaawansowane", "Inżynieria oprogramowania"],
+    },
+  },
 };
+
 
 export default async function BlogPostPage({ params }) {
     const { subject } = await params
