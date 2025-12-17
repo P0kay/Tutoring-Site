@@ -28,7 +28,7 @@ const SUBJECT_DATA = {
     },
   },
 
-  jezyk_angielski: {
+  angielski: {
     title: "JĘZYK ANGIELSKI",
     topicsBySchoolType: {
       primary: ["Podstawowe słownictwo", "Czasy Present", "Dialogi"],
@@ -55,7 +55,7 @@ const SUBJECT_DATA = {
     },
   },
 
-  jezyk_polski: {
+  polski: {
     title: "JĘZYK POLSKI",
     topicsBySchoolType: {
       primary: ["Części mowy", "Lektury", "Pisanie opowiadań"],
