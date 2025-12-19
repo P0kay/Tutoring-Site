@@ -63,7 +63,7 @@ export default async function RootLayout({ children }) {
             Main Page
           </Link>
         </header>
-        <main className="flex justify-center">
+        <main className="flex flex-col items-center">
           {children}
         </main>
       </body>
