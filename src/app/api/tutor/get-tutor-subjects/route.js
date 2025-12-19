@@ -15,10 +15,10 @@ export async function GET() {
         }
 
         const sql = getSql();
-        const tutorSubjects = await sql.query(
+        const tutorSubjectsRaw = await sql.query(
             `
       SELECT
-        s.key AS subject_key,
+        s.key,
         tsl.level
         FROM tutor_subject_levels tsl
         JOIN subjects s ON s.id = tsl.subject_id
@@ -26,6 +26,11 @@ export async function GET() {
       `,
             [user.uuid]
         );
+        const tutorSubjects = tutorSubjectsRaw.reduce((acc, { key, level }) => {
+            if (!acc[key]) acc[key] = [];
+            acc[key].push(level);
+            return acc;
+        }, {});
         return NextResponse.json(
             {
                 tutorSubjects
