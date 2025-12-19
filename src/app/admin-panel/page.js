@@ -56,6 +56,27 @@ async function AdminPanel() {
         );
         revalidatePath('/admin_panel');
     }
+
+    async function removeUser(formData) {
+        'use server';
+
+        const user = await getCurrentUser();
+        if (!user || user.type !== 'admin') {
+            throw new Error('Forbidden');
+        }
+
+        const uuid = formData.get('uuid');
+        if (!uuid || typeof uuid !== 'string') {
+            throw new Error('Invalid uuid');
+        }
+        const sql = getSql();
+
+        await sql.query(
+            'DELETE FROM users WHERE uuid = $1',
+            [uuid]
+        );
+        revalidatePath('/admin_panel');
+    }
     return (
         <div className="p-6">
             <h1 className="text-2xl font-semibold mb-4">Users</h1>
@@ -92,6 +113,16 @@ async function AdminPanel() {
                                     </form> :
                                     <>{u.approved_at.toLocaleDateString()}</>
                                 }
+                            </td><td className="border px-3 py-2">
+                                <form action={removeUser}>
+                                    <input type="hidden" name="uuid" value={u.uuid} />
+                                    <button
+                                        type="submit"
+                                        className="rounded-md bg-red-600 px-3 py-1 text-white hover:bg-green-700"
+                                    >
+                                        Remove
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     ))}
