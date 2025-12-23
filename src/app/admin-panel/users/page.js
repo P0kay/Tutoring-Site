@@ -46,7 +46,10 @@ async function Users() {
         'use server';
 
         const user = await getCurrentUser();
-        if (!user || user.type !== 'admin') {
+        if (!user) {
+            throw new Error('Unauthorized');
+        }
+        if (user.type !== 'admin') {
             throw new Error('Forbidden');
         }
 
