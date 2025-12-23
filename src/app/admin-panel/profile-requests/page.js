@@ -77,7 +77,7 @@ async function ProfileRequests() {
                 reviewed_at = NOW(),
                 status = 'declined'
             WHERE uuid = $2 AND status = 'pending'
-            `, [user.uuid,uprUuid]
+            `, [user.uuid, uprUuid]
         );
         revalidatePath('/admin_panel/profile-requests');
     }
@@ -87,23 +87,23 @@ async function ProfileRequests() {
             <table>
                 <thead className="bg-gray-100">
                     <tr>
-                        <th className="border px-3 py-2 text-left">Request UUID</th>
-                        <th className="border px-3 py-2 text-left">Email</th>
-                        <th className="border px-3 py-2 text-left">First Name</th>
-                        <th className="border px-3 py-2 text-left">Last Name</th>
-                        <th className="border px-3 py-2 text-left">Birth Date</th>
-                        <th className="border px-3 py-2 text-left">Education</th>
-                        <th className="border px-3 py-2 text-left">Bio</th>
-                        <th className="border px-3 py-2 text-left">Created At</th>
-                        <th className="border px-3 py-2 text-left">Reviewed By</th>
-                        <th className="border px-3 py-2 text-left">Reviewed At</th>
-                        <th className="border px-3 py-2 text-left">Status</th>
+                        {/* <th className="border px-2 py-1 text-left">Request UUID</th> */}
+                        <th className="border px-2 py-1 text-left">Email</th>
+                        <th className="border px-2 py-1 text-left">First Name</th>
+                        <th className="border px-2 py-1 text-left">Last Name</th>
+                        <th className="border px-2 py-1 text-left">Birth Date</th>
+                        <th className="border px-2 py-1 text-left">Education</th>
+                        <th className="border px-2 py-1 text-left">Bio</th>
+                        <th className="border px-2 py-1 text-left">Created At</th>
+                        <th className="border px-2 py-1 text-left">Reviewed By</th>
+                        <th className="border px-2 py-1 text-left">Reviewed At</th>
+                        <th className="border px-2 py-1 text-left">Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     {user_profile_requests.map((upr) => (
                         <tr key={upr.uuid}>
-                            <td className="border px-3 py-2">{upr.uuid}</td>
+                            {/* <td className="border px-3 py-2">{upr.uuid}</td> */}
                             <td className="border px-3 py-2">{upr.email}</td>
                             <td className="border px-3 py-2">{upr.first_name}</td>
                             <td className="border px-3 py-2">{upr.last_name}</td>
@@ -113,10 +113,9 @@ async function ProfileRequests() {
                             <td className="border px-3 py-2">{new Date(upr.created_at).toLocaleDateString()}</td>
                             <td className="border px-3 py-2">{upr.reviewed_by}</td>
                             <td className="border px-3 py-2">{upr.reviewed_at !== null ? new Date(upr.reviewed_at).toLocaleDateString() : ''}</td>
-                            <td className="border px-3 py-2">{upr.status}</td>
-                            {upr.status === 'pending' &&
-                                <td className="border px-3 py-2">
-                                    <>
+                            <td className="border px-3 py-2 text-center">
+                                {upr.status === 'pending' ?
+                                    <div className='flex gap-1'>
                                         <form action={approveRequest}>
                                             <input type="hidden" name="upr_uuid" value={upr.uuid} />
                                             <button
@@ -135,9 +134,10 @@ async function ProfileRequests() {
                                                 <XMarkSvg size='30px' />
                                             </button>
                                         </form>
-                                    </>
-                                </td>
-                            }
+
+                                    </div> :
+                                    <span className={`${upr.status === 'approved' ? `text-green-800` : `text-red-700`} font-bold`}>{upr.status}</span>
+                                }</td>
                         </tr>
                     ))}
                 </tbody>

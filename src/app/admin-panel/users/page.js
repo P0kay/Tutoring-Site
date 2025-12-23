@@ -76,7 +76,7 @@ async function Users() {
                         <th className="border px-3 py-2 text-left">Email</th>
                         <th className="border px-3 py-2 text-left">Type</th>
                         <th className="border px-3 py-2 text-left">Birth Date</th>
-                        <th className="border px-3 py-2 text-left">Creation Time</th>
+                        <th className="border px-3 py-2 text-left">Created At</th>
                         <th className="border px-3 py-2 text-left">Approved</th>
                     </tr>
                 </thead>
