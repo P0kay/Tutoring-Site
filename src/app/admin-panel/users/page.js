@@ -1,6 +1,7 @@
 import { getCurrentUser } from '@/app/lib/auth';
 import { getSql } from '@/app/lib/db';
 import { revalidatePath } from 'next/cache';
+import XMarkSvg from '../../../../public/x-mark';
 
 
 async function Users() {
@@ -106,9 +107,9 @@ async function Users() {
                                     <input type="hidden" name="uuid" value={u.uuid} />
                                     <button
                                         type="submit"
-                                        className="rounded-md bg-red-600 px-3 py-1 text-white hover:bg-green-700"
+                                        className="rounded-lg p-2 text-white hover:bg-rose-300"
                                     >
-                                        Remove
+                                        <XMarkSvg size='30px' />
                                     </button>
                                 </form>
                             </td>
