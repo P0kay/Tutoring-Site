@@ -15,23 +15,21 @@ export async function POST(req) {
             console.log(`Verify email for ${email}: ${link}`);
         }
         const { email, password, type, birth_date } = await req.json();
+
+        const sql = getSql();
+        const existingUser = await sql.query(
+            'SELECT uuid FROM users WHERE email = $1',
+            [email]
+        );
+
         if (!email || !password || !type || !birth_date) {
             return NextResponse.json(
                 { message: 'Please provide required information' },
                 { status: 400 }
             );
         }
-        const sql = getSql();
-        const existingUser = await sql.query(
-            'SELECT uuid FROM users WHERE email = $1',
-            [email]
-        );
-        const existingUserRequest = await sql.query(
-            'SELECT uuid FROM user_requests WHERE email = $1',
-            [email]
-        );
 
-        if (existingUser.rowCount > 0 || existingUserRequest.rowCount > 0) {
+        if (existingUser.length > 0) {
             return NextResponse.json(
                 { message: 'Email already exists' },
                 { status: 409 }
