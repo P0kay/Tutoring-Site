@@ -107,7 +107,7 @@ function SignUp() {
 
                 <button
                     type="submit"
-                    className="mt-2 rounded-lg bg-blue-600 py-2 text-white font-medium hover:bg-blue-700 transition"
+                    className="inline-flex items-center justify-center rounded-md border border-slate-900 bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400/40 cursor-pointer"
                 >
                     Sign up
                 </button>

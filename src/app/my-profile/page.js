@@ -1,24 +1,66 @@
 import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/app/lib/auth';
 import { getSql } from '@/app/lib/db';
+import { v4 as uuidv4 } from 'uuid';
+import Link from 'next/link';
 
-async function MyProfile() {
-    const user = await getCurrentUser()
+function toDateInputValue(value) {
+    if (!value) return '';
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return '';
+    console.log(d)
+    console.log(d.toDateString())
+
+    return d.toISOString().slice(0, 10); // YYYY-MM-DD
+}
+
+export default async function MyProfile() {
+    const user = await getCurrentUser();
     if (!user) redirect('/signin');
+
     const sql = getSql();
+
     const rows = await sql.query(
         `
-    SELECT email, type, first_name, last_name, birth_date, education, bio, created_at, approved_at
-    FROM users
-    WHERE uuid = $1::uuid
-    LIMIT 1
-    `,
+        SELECT uuid, email, type, first_name, last_name, birth_date, education, bio, created_at, approved_at
+        FROM users
+        WHERE uuid = $1::uuid
+        LIMIT 1
+        `,
         [user.uuid]
     );
 
-    if (rows.length === 0) redirect('/signin'); // session exists but user deleted
-
+    if (rows.length === 0) redirect('/signin');
     const userData = rows[0];
+
+    async function submitProfileRequest(formData) {
+        'use server';
+
+        const user = await getCurrentUser();
+        if (!user) redirect('/signin');
+
+        const first_name = (formData.get('first_name') || '').toString().trim();
+        const last_name = (formData.get('last_name') || '').toString().trim();
+        const birth_date = (formData.get('birth_date') || '').toString().trim(); // 'YYYY-MM-DD' or ''
+        const education = (formData.get('education') || '').toString().trim();
+        const bio = (formData.get('bio') || '').toString().trim();
+
+        const sql = getSql();
+
+        const uprUuid = uuidv4();
+
+        await sql.query(
+            `
+        INSERT INTO user_profile_requests
+            (uuid, user_uuid, first_name, last_name, birth_date, education, bio, created_at, status)
+        VALUES
+            ($1::uuid, $2::uuid, $3, $4, NULLIF($5, '')::date, $6, $7, NOW(), 'pending')
+        `,
+            [uprUuid, user.uuid, first_name, last_name, birth_date, education, bio]
+        );
+
+        redirect('/my-profile?requested=1');
+    }
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -28,16 +70,19 @@ async function MyProfile() {
                     <p className="mt-1 text-sm text-gray-500">
                         Update your personal information and profile details.
                     </p>
-                    <img src="/blank_profile_picture.png" alt="Blank profile picture" className='w-50 h-50' />
+                    <img
+                        src="/blank_profile_picture.png"
+                        alt="Blank profile picture"
+                        className="mt-4 h-32 w-32 rounded-full border object-cover"
+                    />
                 </div>
 
                 <div className="rounded-2xl bg-white shadow-sm ring-1 ring-gray-200">
-                    {/* Header */}
                     <div className="flex items-start justify-between gap-4 border-b border-gray-100 p-6">
                         <div>
                             <h2 className="text-lg font-semibold text-gray-900">Profile details</h2>
                             <p className="mt-1 text-sm text-gray-500">
-                                Fields below are editable.
+                                Changes will be sent for admin approval.
                             </p>
                         </div>
 
@@ -46,19 +91,18 @@ async function MyProfile() {
                         </span>
                     </div>
 
-                    {/* Form */}
-                    <div className="p-6">
+                    {/* ✅ This form submits to user_profile_requests */}
+                    <form action={submitProfileRequest} className="p-6">
                         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                            {/* Email */}
+                            {/* Email (read-only) */}
                             <div className="sm:col-span-2">
                                 <label className="block text-sm font-medium text-gray-700">Email</label>
                                 <input
-                                    defaultValue={userData.email || ""}
+                                    value={userData.email}
+                                    readOnly
                                     type="email"
-                                    className="mt-2 w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-gray-900
-                             shadow-sm outline-none transition
-                             focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10"
-                                    placeholder="you@example.com"
+                                    className="mt-2 w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-2.5 text-gray-900
+                             shadow-sm outline-none"
                                 />
                             </div>
 
@@ -66,7 +110,8 @@ async function MyProfile() {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">First name</label>
                                 <input
-                                    defaultValue={userData.first_name || ""}
+                                    name="first_name"
+                                    defaultValue={userData.first_name}
                                     type="text"
                                     className="mt-2 w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-gray-900
                              shadow-sm outline-none transition
@@ -79,7 +124,8 @@ async function MyProfile() {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Last name</label>
                                 <input
-                                    defaultValue={userData.last_name || ""}
+                                    name="last_name"
+                                    defaultValue={userData.last_name}
                                     type="text"
                                     className="mt-2 w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-gray-900
                              shadow-sm outline-none transition
@@ -92,7 +138,8 @@ async function MyProfile() {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Birth date</label>
                                 <input
-                                    defaultValue={userData.birth_date}
+                                    name="birth_date"
+                                    defaultValue={toDateInputValue(userData.birth_date)}
                                     type="date"
                                     className="mt-2 w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-gray-900
                              shadow-sm outline-none transition
@@ -104,7 +151,8 @@ async function MyProfile() {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Education</label>
                                 <input
-                                    defaultValue={userData.education || ""}
+                                    name="education"
+                                    defaultValue={userData.education || ''}
                                     type="text"
                                     className="mt-2 w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-gray-900
                              shadow-sm outline-none transition
@@ -117,7 +165,8 @@ async function MyProfile() {
                             <div className="sm:col-span-2">
                                 <label className="block text-sm font-medium text-gray-700">Bio</label>
                                 <textarea
-                                    defaultValue={userData.bio || ""}
+                                    name="bio"
+                                    defaultValue={userData.bio || ''}
                                     rows={4}
                                     className="mt-2 w-full resize-none rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-gray-900
                              shadow-sm outline-none transition
@@ -132,43 +181,41 @@ async function MyProfile() {
                             <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
                                 <p className="text-xs font-medium text-gray-500">User since</p>
                                 <p className="mt-1 text-sm font-semibold text-gray-900">
-                                    {userData.created_at ? new Date(userData.created_at).toLocaleDateString() : "-"}
+                                    {userData.created_at ? new Date(userData.created_at).toLocaleDateString() : '-'}
                                 </p>
                             </div>
 
                             <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
                                 <p className="text-xs font-medium text-gray-500">Approved since</p>
                                 <p className="mt-1 text-sm font-semibold text-gray-900">
-                                    {userData.approved_at ? new Date(userData.approved_at).toLocaleDateString() : "-"}
+                                    {userData.approved_at ? new Date(userData.approved_at).toLocaleDateString() : '-'}
                                 </p>
                             </div>
                         </div>
 
-                        {/* Actions (UI only) */}
+                        {/* Actions */}
                         <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                            <button
-                                type="button"
+                            <Link
+                                href="/my-profile"
                                 className="inline-flex items-center justify-center rounded-xl border border-gray-300 bg-white px-5 py-2.5
-                           text-sm font-medium text-gray-700 shadow-sm transition
-                           hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900/10"
+                                text-sm font-medium text-gray-700 shadow-sm transition
+                                hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900/10"
                             >
                                 Cancel
-                            </button>
+                            </Link>
 
                             <button
-                                type="button"
+                                type="submit"
                                 className="inline-flex items-center justify-center rounded-xl bg-gray-900 px-5 py-2.5
-                           text-sm font-medium text-white shadow-sm transition
-                           hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900/20"
+                                text-sm font-medium text-white shadow-sm transition
+                                hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900/20"
                             >
-                                Save changes
+                                Save changes (send for approval)
                             </button>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
     );
 }
-
-export default MyProfile;

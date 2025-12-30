@@ -14,9 +14,22 @@ async function AdminPanelLayout({ children }) {
     }
     return (
         <>
-            <div className="flex gap-5 mt-10">
-                <Link href={`${baseLink}/users`} className="border-2 rounded p-1">Users</Link>
-                <Link href={`${baseLink}/profile-requests`} className="border-2 rounded p-1">Profile requests</Link>
+            <div className="mt-10 flex gap-2 rounded-lg border border-slate-300 bg-white p-1 shadow-sm mb-10">
+                <Link
+                    href={`${baseLink}/users`}
+                    className="rounded-md px-4 py-2 text-sm font-medium text-slate-700
+               transition-colors hover:bg-slate-100 hover:text-slate-900"
+                >
+                    Users
+                </Link>
+
+                <Link
+                    href={`${baseLink}/profile-requests`}
+                    className="rounded-md px-4 py-2 text-sm font-medium text-slate-700
+               transition-colors hover:bg-slate-100 hover:text-slate-900"
+                >
+                    Profile requests
+                </Link>
             </div>
             {children}
         </>

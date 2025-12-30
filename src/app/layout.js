@@ -30,38 +30,87 @@ export default async function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <header className="flex justify-end gap-8 p-8">
-          {user ?
-            <>
-              {user.type === 'admin' &&
-                <Link href='/admin-panel' className="border-2 w-25 h-10 rounded-lg flex justify-center items-center cursor-pointer transition-colors duration-200 hover:bg-amber-300 hover:border-amber-400">
-                  Admin Panel
-                </Link>
-              }
-              {(user.type === 'admin' || user.type === 'tutor') &&
-                <Link href='/tutor-panel' className="border-2 w-25 h-10 rounded-lg flex justify-center items-center cursor-pointer transition-colors duration-200 hover:bg-green-300 hover:border-green-400">Tutor Panel</Link>
-              }
-              <form action="/api/auth/signout" method="POST">
-                <button className="border-2 w-20 h-10 rounded-lg flex justify-center items-center cursor-pointer transition-colors duration-200 hover:bg-red-300 hover:border-red-400">
-                  Sign out
-                </button>
-              </form>
-              <Link href='/my-profile' className="border-2 w-25 h-10 rounded-lg flex justify-center items-center cursor-pointer transition-colors duration-200 hover:bg-blue-300 hover:border-blue-400">
-                My profile
+        <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/90 backdrop-blur">
+          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+            <Link
+              href="/"
+              className="text-2xl font-semibold tracking-tight text-slate-900"
+            >
+              TutoringSite
+            </Link>
+
+            <nav className="flex items-center gap-3">
+              {/* Nav link */}
+              <Link
+                href="/"
+                className="inline-flex items-center justify-center rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-800 transition-all hover:bg-slate-200 hover:border-slate-300 hover:shadow-sm"
+              >
+                Main page
               </Link>
-            </> :
-            <>
-              <Link href='/signin' className="border-2 w-20 h-10 rounded-lg flex justify-center items-center cursor-pointer transition-colors duration-200 hover:bg-blue-300 hover:border-blue-400">
-                Sign In
-              </Link>
-              <Link href='/signup' className="border-2 w-20 h-10 rounded-lg flex justify-center items-center cursor-pointer transition-colors duration-200 hover:bg-blue-300 hover:border-blue-400">
-                Sign Up
-              </Link>
-            </>
-          }
-          <Link href='/' className="border-2 w-20 h-10 rounded-lg flex justify-center items-center">
-            Main Page
-          </Link>
+
+              {user ? (
+                <>
+                  {user.type === "admin" && (
+                    <Link
+                      href="/admin-panel"
+                      className="inline-flex items-center justify-center rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-800 transition-all hover:bg-slate-200 hover:border-slate-300 hover:shadow-sm"
+                    >
+                      Admin panel
+                    </Link>
+                  )}
+
+                  {(user.type === "admin" || user.type === "tutor") && (
+                    <Link
+                      href="/tutor-panel"
+                      className="inline-flex items-center justify-center rounded-md border border-slate-200 bg-white
+                                 px-4 py-2 text-sm font-medium text-slate-800 transition-all
+                                 hover:bg-slate-200 hover:border-slate-300 hover:shadow-sm"
+                    >
+                      Tutor panel
+                    </Link>
+                  )}
+
+                  <Link
+                    href="/my-profile"
+                    className="inline-flex items-center justify-center rounded-md border border-slate-900 bg-slate-900
+                               px-4 py-2 text-sm font-medium text-white transition-all
+                               hover:bg-slate-700 hover:-translate-y-px hover:shadow-sm"
+                  >
+                    My profile
+                  </Link>
+
+                  <form action="/api/auth/signout" method="POST">
+                    <button
+                      type="submit"
+                      className="inline-flex items-center justify-center rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-red-400 transition-all hover:bg-red-200 hover:border-red-400 hover:shadow-sm cursor-pointer"
+                    >
+                      Sign out
+                    </button>
+                  </form>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/signin"
+                    className="inline-flex items-center justify-center rounded-md border border-slate-200 bg-white
+                               px-4 py-2 text-sm font-medium text-slate-800 transition-all
+                               hover:bg-slate-200 hover:border-slate-300 hover:shadow-sm"
+                  >
+                    Sign in
+                  </Link>
+
+                  <Link
+                    href="/signup"
+                    className="inline-flex items-center justify-center rounded-md border border-slate-900 bg-slate-900
+                               px-4 py-2 text-sm font-medium text-white transition-all
+                               hover:bg-slate-700 hover:-translate-y-px hover:shadow-sm"
+                  >
+                    Sign up
+                  </Link>
+                </>
+              )}
+            </nav>
+          </div>
         </header>
         <main className="flex flex-col items-center">
           {children}

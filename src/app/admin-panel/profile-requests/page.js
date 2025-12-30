@@ -82,68 +82,135 @@ async function ProfileRequests() {
         revalidatePath('/admin_panel/profile-requests');
     }
     return (
-        <div className="p-6">
-            <h1 className="text-2xl font-semibold mb-4">Profile pending Requests</h1>
-            <table>
-                <thead className="bg-gray-100">
-                    <tr>
-                        {/* <th className="border px-2 py-1 text-left">Request UUID</th> */}
-                        <th className="border px-2 py-1 text-left">Email</th>
-                        <th className="border px-2 py-1 text-left">First Name</th>
-                        <th className="border px-2 py-1 text-left">Last Name</th>
-                        <th className="border px-2 py-1 text-left">Birth Date</th>
-                        <th className="border px-2 py-1 text-left">Education</th>
-                        <th className="border px-2 py-1 text-left">Bio</th>
-                        <th className="border px-2 py-1 text-left">Created At</th>
-                        <th className="border px-2 py-1 text-left">Reviewed By</th>
-                        <th className="border px-2 py-1 text-left">Reviewed At</th>
-                        <th className="border px-2 py-1 text-left">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {user_profile_requests.map((upr) => (
-                        <tr key={upr.uuid}>
-                            {/* <td className="border px-3 py-2">{upr.uuid}</td> */}
-                            <td className="border px-3 py-2">{upr.email}</td>
-                            <td className="border px-3 py-2">{upr.first_name}</td>
-                            <td className="border px-3 py-2">{upr.last_name}</td>
-                            <td className="border px-3 py-2">{new Date(upr.birth_date).toLocaleDateString()}</td>
-                            <td className="border px-3 py-2">{upr.education}</td>
-                            <td className="border px-3 py-2">{upr.bio}</td>
-                            <td className="border px-3 py-2">{new Date(upr.created_at).toLocaleDateString()}</td>
-                            <td className="border px-3 py-2">{upr.reviewed_by}</td>
-                            <td className="border px-3 py-2">{upr.reviewed_at !== null ? new Date(upr.reviewed_at).toLocaleDateString() : ''}</td>
-                            <td className="border px-3 py-2 text-center">
-                                {upr.status === 'pending' ?
-                                    <div className='flex gap-1'>
-                                        <form action={approveRequest}>
-                                            <input type="hidden" name="upr_uuid" value={upr.uuid} />
-                                            <button
-                                                type="submit"
-                                                className="rounded-lg p-2 text-white hover:bg-emerald-200"
-                                            >
-                                                <CheckMarkSvg size='30px' />
-                                            </button>
-                                        </form>
-                                        <form action={declineRequest}>
-                                            <input type="hidden" name="upr_uuid" value={upr.uuid} />
-                                            <button
-                                                type="submit"
-                                                className="rounded-lg p-2 text-white hover:bg-rose-300"
-                                            >
-                                                <XMarkSvg size='30px' />
-                                            </button>
-                                        </form>
+        <div className="mx-auto w-full max-w-7xl">
+            <h1 className="text-2xl font-semibold text-slate-900 mb-4">
+                Profile Pending Requests
+            </h1>
 
-                                    </div> :
-                                    <span className={`${upr.status === 'approved' ? `text-green-800` : `text-red-700`} font-bold`}>{upr.status}</span>
-                                }</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            <div className="overflow-hidden rounded-xl border border-slate-300 bg-white shadow-sm">
+                <div className="overflow-x-auto">
+                    <table className="min-w-full border-collapse">
+                        <thead className="sticky top-0 bg-slate-50">
+                            <tr>
+                                <th className="border-b border-slate-300 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                    Email
+                                </th>
+                                <th className="border-b border-slate-300 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                    First name
+                                </th>
+                                <th className="border-b border-slate-300 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                    Last name
+                                </th>
+                                <th className="border-b border-slate-300 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                    Birth date
+                                </th>
+                                <th className="border-b border-slate-300 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                    Education
+                                </th>
+                                <th className="border-b border-slate-300 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                    Bio
+                                </th>
+                                <th className="border-b border-slate-300 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                    Created
+                                </th>
+                                <th className="border-b border-slate-300 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                    Reviewed at
+                                </th>
+                                <th className="border-b border-slate-300 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                    Status
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {user_profile_requests.map((upr, idx) => (
+                                <tr
+                                    key={upr.uuid}
+                                    className={[
+                                        idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50',
+                                        'transition-colors hover:bg-slate-100',
+                                    ].join(' ')}
+                                >
+                                    <td className="border-b border-slate-200 px-4 py-3 text-sm text-slate-900">
+                                        {upr.email}
+                                    </td>
+
+                                    <td className="border-b border-slate-200 px-4 py-3 text-sm text-slate-800">
+                                        {upr.first_name}
+                                    </td>
+
+                                    <td className="border-b border-slate-200 px-4 py-3 text-sm text-slate-800">
+                                        {upr.last_name}
+                                    </td>
+
+                                    <td className="border-b border-slate-200 px-4 py-3 text-sm text-slate-700">
+                                        {new Date(upr.birth_date).toLocaleDateString()}
+                                    </td>
+
+                                    <td className="border-b border-slate-200 px-4 py-3 text-sm text-slate-700">
+                                        {upr.education}
+                                    </td>
+
+                                    <td className="border-b border-slate-200 px-4 py-3 text-sm text-slate-700 max-w-sm truncate">
+                                        {upr.bio}
+                                    </td>
+
+                                    <td className="border-b border-slate-200 px-4 py-3 text-sm text-slate-700">
+                                        {new Date(upr.created_at).toLocaleDateString()}
+                                    </td>
+
+                                    <td className="border-b border-slate-200 px-4 py-3 text-sm text-slate-700">
+                                        {upr.reviewed_at
+                                            ? new Date(upr.reviewed_at).toLocaleDateString()
+                                            : '—'}
+                                    </td>
+
+                                    <td className="border-b border-slate-200 px-4 py-3 text-center">
+                                        {upr.status === 'pending' ? (
+                                            <div className="flex justify-center gap-2">
+                                                <form action={approveRequest}>
+                                                    <input type="hidden" name="upr_uuid" value={upr.uuid} />
+                                                    <button
+                                                        type="submit"
+                                                        className="rounded-lg border border-emerald-200 bg-emerald-50 p-2
+                                     transition-colors hover:bg-emerald-100"
+                                                    >
+                                                        <CheckMarkSvg size="22px" />
+                                                    </button>
+                                                </form>
+
+                                                <form action={declineRequest}>
+                                                    <input type="hidden" name="upr_uuid" value={upr.uuid} />
+                                                    <button
+                                                        type="submit"
+                                                        className="rounded-lg border border-rose-200 bg-rose-50 p-2
+                                     transition-colors hover:bg-rose-100"
+                                                    >
+                                                        <XMarkSvg size="22px" />
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        ) : (
+                                            <span
+                                                className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium
+                        ${upr.status === 'approved'
+                                                        ? 'border-emerald-300 bg-emerald-50 text-emerald-700'
+                                                        : 'border-rose-300 bg-rose-50 text-rose-700'
+                                                    }`}
+                                            >
+                                                {upr.status}
+                                            </span>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     );
+
 }
 
 export default ProfileRequests;
