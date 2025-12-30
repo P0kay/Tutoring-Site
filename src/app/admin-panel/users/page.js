@@ -56,7 +56,7 @@ async function Users() {
     return (
         <div className="">
             <h1 className="text-2xl font-semibold text-slate-900 mb-4">
-                Users Pending Requests
+                User Pending Requests
             </h1>
             <div className="overflow-x-auto overflow-hidden rounded-xl border border-slate-300 bg-white shadow-sm">
                 <table className="min-w-full border-collapse">
@@ -119,8 +119,7 @@ async function Users() {
                                                 <input type="hidden" name="uuid" value={u.uuid} />
                                                 <button
                                                     type="submit"
-                                                    className="rounded-lg border border-emerald-200 bg-emerald-50 p-2
-                                 transition-colors hover:bg-emerald-100"
+                                                    className="rounded-lg border border-emerald-200 bg-emerald-50 p-2 transition-colors hover:bg-emerald-100 cursor-pointer"
                                                 >
                                                     <CheckMarkSvg size="22px" />
                                                 </button>
@@ -130,8 +129,7 @@ async function Users() {
                                                 <input type="hidden" name="uuid" value={u.uuid} />
                                                 <button
                                                     type="submit"
-                                                    className="rounded-lg border border-rose-200 bg-rose-50 p-2
-                                 transition-colors hover:bg-rose-100"
+                                                    className="rounded-lg border border-rose-200 bg-rose-50 p-2 transition-colors hover:bg-rose-200 cursor-pointer"
                                                 >
                                                     <XMarkSvg size="22px" />
                                                 </button>
