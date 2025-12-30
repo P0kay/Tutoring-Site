@@ -172,8 +172,7 @@ async function ProfileRequests() {
                                                     <input type="hidden" name="upr_uuid" value={upr.uuid} />
                                                     <button
                                                         type="submit"
-                                                        className="rounded-lg border border-emerald-200 bg-emerald-50 p-2
-                                     transition-colors hover:bg-emerald-100"
+                                                        className="rounded-lg border border-emerald-200 bg-emerald-50 p-2 transition-colors hover:bg-emerald-100 cursor-pointer"
                                                     >
                                                         <CheckMarkSvg size="22px" />
                                                     </button>
@@ -183,8 +182,7 @@ async function ProfileRequests() {
                                                     <input type="hidden" name="upr_uuid" value={upr.uuid} />
                                                     <button
                                                         type="submit"
-                                                        className="rounded-lg border border-rose-200 bg-rose-50 p-2
-                                     transition-colors hover:bg-rose-100"
+                                                        className="rounded-lg border border-rose-200 bg-rose-50 p-2 transition-colors hover:bg-rose-200 cursor-pointer"
                                                     >
                                                         <XMarkSvg size="22px" />
                                                     </button>
