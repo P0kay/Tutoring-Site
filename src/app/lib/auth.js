@@ -10,7 +10,7 @@ export async function getCurrentUser() {
 
   const rows = await sql.query(
     `
-    SELECT u.uuid, u.email, u.type
+    SELECT u.uuid, u.email, u.type, u.approved_at
     FROM sessions s
     JOIN users u ON u.uuid = s.user_uuid
     WHERE s.uuid = $1::uuid

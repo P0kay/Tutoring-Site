@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSql } from '@/app/lib/db';
 import { getCurrentUser } from '@/app/lib/auth';
-import unflattenSubjects from '@/app/lib/unflattenSubjects';
 
 export async function GET() {
     try {
@@ -11,29 +10,29 @@ export async function GET() {
             return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
         }
 
-        if (user.type !== 'tutor' && user.type !== 'admin') {
+        if ((user.type !== 'tutor' && user.type !== 'admin') || user.approved_at === null) {
             return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
         }
 
         const sql = getSql();
-        const tutorSubjectsRaw = await sql.query(
+        const isOnline = await sql.query(
             `
-      SELECT
-        s.uuid,
-        tsl.level
-        FROM tutor_subject_levels tsl
-        JOIN subjects s ON s.uuid = tsl.subject_uuid
-        WHERE tsl.tutor_uuid = $1::uuid
-      `,
+            SELECT is_online
+            FROM tutor_activity
+            WHERE tutor_uuid = $1::uuid
+            `,
             [user.uuid]
         );
-        const tutorSubjects = unflattenSubjects(tutorSubjectsRaw)
+        if (isOnline.length > 0) {
+            return NextResponse.json(
+                isOnline[0],
+                { status: 200 }
+            );
+        }
         return NextResponse.json(
-            {
-                tutorSubjects
-            },
-            { status: 200 }
-        );
+            { message: "User doesn't exist" },
+            { status: 404 }
+        )
     } catch (error) {
         console.error(error);
         return NextResponse.json({ message: 'Internal server error' }, { status: 500 });

@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getSql } from '@/app/lib/db';
 import { getCurrentUser } from '@/app/lib/auth';
-import unflattenSubjects from '@/app/lib/unflattenSubjects';
 
-export async function GET() {
+export async function PATCH() {
     try {
         const user = await getCurrentUser();
 
@@ -11,27 +10,34 @@ export async function GET() {
             return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
         }
 
-        if (user.type !== 'tutor' && user.type !== 'admin') {
+        if ((user.type !== 'tutor' && user.type !== 'admin') || user.approved_at === null) {
             return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
         }
 
         const sql = getSql();
-        const tutorSubjectsRaw = await sql.query(
+        await sql.query(
             `
-      SELECT
-        s.uuid,
-        tsl.level
-        FROM tutor_subject_levels tsl
-        JOIN subjects s ON s.uuid = tsl.subject_uuid
-        WHERE tsl.tutor_uuid = $1::uuid
-      `,
+            UPDATE
+              tutor_activity
+            SET
+              is_online=FALSE
+            WHERE
+              tutor_uuid = $1::uuid
+            `,
             [user.uuid]
         );
-        const tutorSubjects = unflattenSubjects(tutorSubjectsRaw)
+
+        await sql.query(
+            `
+            DELETE FROM
+                tutor_online_subjects
+            WHERE
+                user_uuid = $1::uuid;
+            `,
+            [user.uuid]
+        )
         return NextResponse.json(
-            {
-                tutorSubjects
-            },
+            { success: true },
             { status: 200 }
         );
     } catch (error) {

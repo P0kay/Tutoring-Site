@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Forbidden from '../components/forbidden';
+import Unauthorized from '../components/unauthorized';
 
 const LEVEL_LABELS = {
   primary: 'Szkoła podstawowa',
@@ -15,7 +17,7 @@ export default function TutorPanel() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  const [status, setStatus] = useState(null);
+  const [isOnline, setIsOnline] = useState(false)
 
   useEffect(() => {
     let cancelled = false;
@@ -23,18 +25,32 @@ export default function TutorPanel() {
     async function load() {
       setLoading(true);
       setError(null);
-      setStatus(null);
-
       try {
+        const online_res = await fetch('/api/tutor/get-online-status', { method: 'GET', credentials: 'include', cache: 'no-store' });
+        if (!online_res.ok) {
+          if (!cancelled) setError(online_res.status);
+          return;
+        }
+        const online_data = await online_res.json().catch(() => ({}));
+        const online = online_data.is_online;
+        if (!cancelled) setIsOnline(Boolean(online));
+
         const res = await fetch('/api/tutor/get-tutor-subjects', {
           method: 'GET',
           credentials: 'include',
-          cache: 'no-store',
+          cache: 'no-store'
         });
+        if (online !== false && online !== true) {
+          setError(online_res.status)
+        }
+        else {
+          setIsOnline(online);
+        }
 
         const data = await res.json().catch(() => ({}));
 
         if (!res.ok) {
+          setError(data?.message || 'Failed to load tutor subjects')
           throw new Error(data?.message || 'Failed to load tutor subjects');
         }
 
@@ -95,33 +111,57 @@ export default function TutorPanel() {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
-    setStatus(null);
 
     try {
       const res = await fetch('/api/tutor/go-online', {
-        method: 'POST',
+        method: 'PATCH',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ subjects: selectedForSend }),
       });
-
-      const data = await res.json().catch(() => ({}));
-
       if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
         throw new Error(data?.message || 'Failed to go online');
       }
-
-      setStatus('You are now online!');
+      setIsOnline(true)
     } catch (err) {
       setError(err.message || 'Something went wrong');
     } finally {
       setSubmitting(false);
     }
   }
-
+  async function goOffline() {
+    try {
+      const res = await fetch('/api/tutor/go-offline', { method: 'PATCH', credentials: 'include' });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.message || 'Failed to go offline');
+      }
+    } catch (err) {
+      setError(err.message || 'Something went wrong');
+    }
+    setIsOnline(false)
+  }
   if (loading) return <div className="p-6">Loading…</div>;
+  if (error === 403) return <Forbidden />
+  if (error === 401) return <Unauthorized />
   if (error) return <div className="p-6 text-red-600">{error}</div>;
+  if (isOnline) return (
+    <>
+      <p className='text-center'>
+        You're online
+      </p>
+      <div className="flex flex-col gap-4 w-full max-w-sm bg-white p-6 rounded-2xl shadow-md">
 
+        <button
+          type="button"
+          className="mt-2 rounded-lg bg-red-600 py-2 text-white font-medium hover:bg-red-700 transition p-4 cursor-pointer"
+          onClick={goOffline}
+        >
+          GO OFFLINE
+        </button>
+      </div>
+    </>)
   return (
     <form onSubmit={handleSubmit} className="m-6 gap-8 flex flex-col">
       {Object.keys(tutorSubjects).length === 0 ? (
@@ -155,8 +195,6 @@ export default function TutorPanel() {
         <p className="font-semibold mb-2">Selected object (to send later)</p>
         <pre className="text-sm overflow-auto">{JSON.stringify(selectedForSend, null, 2)}</pre>
       </div>
-
-      {status && <p className="text-green-700">{status}</p>}
 
       <button
         type="submit"
