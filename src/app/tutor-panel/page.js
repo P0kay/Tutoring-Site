@@ -16,7 +16,8 @@ export default function TutorPanel() {
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState(null);
+  const [errorStatus, setErrorStatus] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
   const [isOnline, setIsOnline] = useState(false)
 
   useEffect(() => {
@@ -24,35 +25,41 @@ export default function TutorPanel() {
 
     async function load() {
       setLoading(true);
-      setError(null);
+      setErrorMessage(null);
+      setErrorStatus(null);
       try {
         const online_res = await fetch('/api/tutor/get-online-status', { method: 'GET', credentials: 'include', cache: 'no-store' });
         if (!online_res.ok) {
-          if (!cancelled) setError(online_res.status);
+          if (!cancelled) {
+            setErrorMessage(online_res.statusText);
+            setErrorStatus(online_res.status);
+          }
           return;
         }
         const online_data = await online_res.json().catch(() => ({}));
-        const online = online_data.is_online;
-        if (!cancelled) setIsOnline(Boolean(online));
+        const isOnline = online_data.is_online;
+        if (!cancelled) setIsOnline(Boolean(isOnline));
+
+        if (isOnline !== false && online !== true) {
+          setErrorMessage(online_res.statusText);
+          setErrorStatus(online_res.status);
+        }
+        else {
+          setIsOnline(isOnline);
+        }
 
         const res = await fetch('/api/tutor/get-tutor-subjects', {
           method: 'GET',
           credentials: 'include',
           cache: 'no-store'
         });
-        if (online !== false && online !== true) {
-          setError(online_res.status)
-        }
-        else {
-          setIsOnline(online);
-        }
-
-        const data = await res.json().catch(() => ({}));
 
         if (!res.ok) {
-          setError(data?.message || 'Failed to load tutor subjects')
-          throw new Error(data?.message || 'Failed to load tutor subjects');
+          setErrorMessage(res.statusText || 'Failed to load tutor subjects')
+          setErrorStatus(res.status);
+          throw new Error(res.statusText || 'Failed to load tutor subjects');
         }
+        const data = await res.json().catch(() => ({}));
 
         const options = data?.tutorSubjects && typeof data.tutorSubjects === 'object'
           ? data.tutorSubjects
@@ -70,7 +77,7 @@ export default function TutorPanel() {
           setSelectedTutorSubjects(nextSelected);
         }
       } catch (err) {
-        if (!cancelled) setError(err.message || 'Something went wrong');
+        if (!cancelled) setErrorMessage(err.message || 'Something went wrong');
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -110,7 +117,8 @@ export default function TutorPanel() {
   async function handleSubmit(e) {
     e.preventDefault();
     setSubmitting(true);
-    setError(null);
+    setErrorMessage(null);
+    setErrorStatus(null)
 
     try {
       const res = await fetch('/api/tutor/go-online', {
@@ -120,12 +128,13 @@ export default function TutorPanel() {
         body: JSON.stringify({ subjects: selectedForSend }),
       });
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data?.message || 'Failed to go online');
+        setErrorMessage(res.statusText)
+        setErrorStatus(res.status)
+        throw new Error(res.statusText || 'Failed to go online');
       }
       setIsOnline(true)
     } catch (err) {
-      setError(err.message || 'Something went wrong');
+      setErrorMessage(err.message || 'Something went wrong');
     } finally {
       setSubmitting(false);
     }
@@ -138,14 +147,14 @@ export default function TutorPanel() {
         throw new Error(data?.message || 'Failed to go offline');
       }
     } catch (err) {
-      setError(err.message || 'Something went wrong');
+      setErrorMessage(err.message || 'Something went wrong');
     }
     setIsOnline(false)
   }
+  if (errorStatus === 403) return <Forbidden />
+  if (errorStatus === 401) return <Unauthorized />
   if (loading) return <div className="p-6">Loading…</div>;
-  if (error === 403) return <Forbidden />
-  if (error === 401) return <Unauthorized />
-  if (error) return <div className="p-6 text-red-600">{error}</div>;
+  if (errorMessage) return <div className="p-6 text-red-600">{errorMessage}</div>;
   if (isOnline) return (
     <>
       <p className='text-center'>
