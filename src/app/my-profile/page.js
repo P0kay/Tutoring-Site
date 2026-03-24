@@ -8,8 +8,6 @@ function toDateInputValue(value) {
     if (!value) return '';
     const d = new Date(value);
     if (Number.isNaN(d.getTime())) return '';
-    console.log(d)
-    console.log(d.toDateString())
 
     return d.toISOString().slice(0, 10); // YYYY-MM-DD
 }
@@ -63,23 +61,23 @@ export default async function MyProfile() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="mx-auto max-w-3xl px-4 py-10">
+        <div className="rounded-xl my-8 ">
+            <div className="mx-auto max-w-3xl px-8 py-8 ">
                 <div className="mb-8">
                     <h1 className="text-3xl font-semibold text-gray-900">My Profile</h1>
                     <p className="mt-1 text-sm text-gray-500">
                         Update your personal information and profile details.
                     </p>
-                    <img
-                        src="/blank_profile_picture.png"
-                        alt="Blank profile picture"
-                        className="mt-4 h-32 w-32 rounded-full border object-cover"
-                    />
                 </div>
 
                 <div className="rounded-2xl bg-white shadow-sm ring-1 ring-gray-200">
                     <div className="flex items-start justify-between gap-4 border-b border-gray-100 p-6">
-                        <div>
+                        <img
+                            src="/blank_profile_picture.png"
+                            alt="Blank profile picture"
+                            className="h-32 w-32 rounded-full border object-cover"
+                        />
+                        <div className='h-full self-center'>
                             <h2 className="text-lg font-semibold text-gray-900">Profile details</h2>
                             <p className="mt-1 text-sm text-gray-500">
                                 Changes will be sent for admin approval.

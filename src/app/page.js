@@ -1,27 +1,22 @@
 import Subject from "./components/subject";
+import { getSql } from "./lib/db";
 
-export default function Home() {
-  const SUBJECTS = [
-    { label: "CHEMIA", slug: "chemia" },
-    { label: "MATEMATYKA", slug: "matematyka" },
-    { label: "ANGIELSKI", slug: "angielski" },
-    { label: "BIOLOGIA", slug: "biologia" },
-    { label: "FIZYKA", slug: "fizyka" },
-    { label: "POLSKI", slug: "polski" },
-    { label: "HISTORIA", slug: "historia" },
-    { label: "INFORMATYKA", slug: "informatyka" },
-    { label: "GEOGRAFIA", slug: "geografia" },
-  ];
-
+export default async function Home() {
+  const sql = getSql()
+  const subjects = await sql.query(
+    `
+        SELECT
+          key
+        FROM
+          subjects
+        `
+  );
   return (
-    <span className="flex gap-16 p-16 flex-wrap justify-center">
-      {SUBJECTS.map(subject =>
-        
-         <Subject key={subject.slug} 
-         subject_name={subject.label} 
-         href={`/${subject.slug}`} />
-        
+    <div className="flex flex-wrap justify-center gap-8 max-w-[90%] w-300 py-10">
+      {subjects.map(subject =>
+        <Subject key={subject.key}
+          subject_name={subject.key} />
       )}
-    </span>
+    </div>
   );
 }

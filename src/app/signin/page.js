@@ -35,7 +35,7 @@ export default function SignIn() {
     }
 
     return (
-        <div className="h-min rounded-xl shadow-xl">
+        <div className="h-min rounded-xl shadow-xl mt-8">
             <form
                 onSubmit={handleSubmit}
                 className="flex flex-col gap-4 w-full max-w-sm bg-white p-6 rounded-2xl shadow-md"
