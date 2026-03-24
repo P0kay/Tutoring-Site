@@ -1,8 +1,7 @@
 export default function unflattenSubjects(subjectsRaw) {
-    const subjects = subjectsRaw.reduce((acc, { uuid, level }) => {
-        if (!acc[uuid]) acc[uuid] = [];
-        acc[uuid].push(level);
+    return subjectsRaw.reduce((acc, { uuid, key, level }) => {
+        if (!acc[uuid]) acc[uuid] = { name: key, levels: [] };
+        if (!acc[uuid].levels.includes(level)) acc[uuid].levels.push(level);
         return acc;
     }, {});
-    return subjects
 }

@@ -39,11 +39,6 @@ export default function TutorPanel() {
         const online_data = await online_res.json().catch(() => ({}));
         const isOnline = online_data.is_online;
         if (!cancelled) setIsOnline(Boolean(isOnline));
-
-        if (isOnline !== false && online !== true) {
-          setErrorMessage(online_res.statusText);
-          setErrorStatus(online_res.status);
-        }
         else {
           setIsOnline(isOnline);
         }
@@ -53,28 +48,17 @@ export default function TutorPanel() {
           credentials: 'include',
           cache: 'no-store'
         });
-
         if (!res.ok) {
           setErrorMessage(res.statusText || 'Failed to load tutor subjects')
           setErrorStatus(res.status);
           throw new Error(res.statusText || 'Failed to load tutor subjects');
         }
         const data = await res.json().catch(() => ({}));
-
-        const options = data?.tutorSubjects && typeof data.tutorSubjects === 'object'
-          ? data.tutorSubjects
-          : {};
-
-        // Default selection: start checked exactly as returned by API
-        // (if you want default empty, replace nextSelected with {})
-        const nextSelected = {};
-        for (const [subjectKey, levels] of Object.entries(options)) {
-          nextSelected[subjectKey] = Array.isArray(levels) ? [...levels] : [];
-        }
+        const options = data?.tutorSubjects ? data.tutorSubjects : {}
 
         if (!cancelled) {
           setTutorSubjects(options);
-          setSelectedTutorSubjects(nextSelected);
+          setSelectedTutorSubjects(options);
         }
       } catch (err) {
         if (!cancelled) setErrorMessage(err.message || 'Something went wrong');
@@ -88,31 +72,36 @@ export default function TutorPanel() {
       cancelled = true;
     };
   }, []);
+  const selectedForSend = useMemo(() => selectedTutorSubjects, [selectedTutorSubjects]);
 
-  function isChecked(subjectKey, level) {
-    return (selectedTutorSubjects[subjectKey] || []).includes(level);
-  }
-
-  function toggle(subjectKey, level) {
+  function handleSubjectLevelToggle(subjectUuid, level, checked) {
     setSelectedTutorSubjects((prev) => {
-      const current = prev[subjectKey] || [];
-      const exists = current.includes(level);
+      const currentSubject = tutorSubjects[subjectUuid];
+      if (!currentSubject) return prev;
 
-      const nextLevels = exists
-        ? current.filter((l) => l !== level)
-        : [...current, level];
+      const currentLevels = prev[subjectUuid]?.levels || [];
+      const hasLevel = currentLevels.includes(level);
+
+      let nextLevels = currentLevels;
+      if (checked && !hasLevel) {
+        nextLevels = [...currentLevels, level];
+      }
+      if (!checked && hasLevel) {
+        nextLevels = currentLevels.filter((lvl) => lvl !== level);
+      }
 
       const next = { ...prev };
-
-      // If none selected for subject, remove key (keeps object clean)
-      if (nextLevels.length === 0) delete next[subjectKey];
-      else next[subjectKey] = nextLevels;
-
+      if (nextLevels.length === 0) {
+        delete next[subjectUuid];
+      } else {
+        next[subjectUuid] = {
+          name: currentSubject.name,
+          levels: nextLevels,
+        };
+      }
       return next;
     });
   }
-
-  const selectedForSend = useMemo(() => selectedTutorSubjects, [selectedTutorSubjects]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -156,7 +145,7 @@ export default function TutorPanel() {
   if (loading) return <div className="p-6">Loading…</div>;
   if (errorMessage) return <div className="p-6 text-red-600">{errorMessage}</div>;
   if (isOnline) return (
-    <>
+    <section className='mt-8'>
       <p className='text-center'>
         You're online
       </p>
@@ -170,24 +159,24 @@ export default function TutorPanel() {
           GO OFFLINE
         </button>
       </div>
-    </>)
+    </section>)
   return (
     <form onSubmit={handleSubmit} className="m-6 gap-8 flex flex-col">
       {Object.keys(tutorSubjects).length === 0 ? (
         <p className="text-gray-600">No subjects available.</p>
       ) : (
         <div className="flex flex-wrap gap-4">
-          {Object.entries(tutorSubjects).map(([subjectKey, levels]) => (
-            <div key={subjectKey} className="rounded-xl border p-4 w-72">
-              <p className="font-semibold">{subjectKey}</p>
+          {Object.entries(tutorSubjects).map(([subjectUuid, subject]) => (
+            <div key={subjectUuid} className="rounded-xl border p-4 w-72">
+              <p className="font-semibold">{subject.name}</p>
 
               <div className="mt-2 space-y-2">
-                {(levels || []).map((lvl) => (
-                  <label key={`${subjectKey}-${lvl}`} className="flex items-center gap-2">
+                {(subject.levels || []).map((lvl) => (
+                  <label key={`${subjectUuid}-${lvl}`} className="flex items-center gap-2">
                     <input
                       type="checkbox"
-                      checked={isChecked(subjectKey, lvl)}
-                      onChange={() => toggle(subjectKey, lvl)}
+                      checked={(selectedTutorSubjects[subjectUuid]?.levels || []).includes(lvl)}
+                      onChange={(e) => handleSubjectLevelToggle(subjectUuid, lvl, e.target.checked)}
                     />
                     <span className="text-sm text-gray-700">
                       {LEVEL_LABELS[lvl] || lvl}
