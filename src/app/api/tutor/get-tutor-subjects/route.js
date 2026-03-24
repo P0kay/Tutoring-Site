@@ -19,7 +19,7 @@ export async function GET() {
         const tutorSubjectsRaw = await sql.query(
             `
       SELECT
-        s.uuid, s.key,s
+        s.uuid, s.key,
         tsl.level
         FROM tutor_subject_levels tsl
         JOIN subjects s ON s.uuid = tsl.subject_uuid
