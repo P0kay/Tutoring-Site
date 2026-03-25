@@ -1,7 +1,7 @@
-function UserIcon({ name, online = false, width = 8, height = 8, subtitle}) {
+function UserIcon({ name, online = false, width = 8, height = 8, subtitle }) {
     return (
-        <figure className={`relative flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3`}>
-            <div className="relative shrink-0">
+        <figure className={`relative flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 cursor-pointer`}>
+            <div className="relative">
                 <img
                     src="/blank_profile_picture.png"
                     alt={name ? `${name} profile picture` : "Blank profile picture"}
