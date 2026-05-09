@@ -54,8 +54,8 @@ export default function TutorPanel() {
           throw new Error(res.statusText || 'Failed to load tutor subjects');
         }
         const data = await res.json().catch(() => ({}));
-        const options = data?.tutorSubjects ? data.tutorSubjects : {}
-
+        const options = data?.tutorSubjects
+        console.log(options)
         if (!cancelled) {
           setTutorSubjects(options);
           setSelectedTutorSubjects(options);
@@ -167,7 +167,7 @@ export default function TutorPanel() {
       ) : (
         <div className="flex flex-wrap gap-4">
           {Object.entries(tutorSubjects).map(([subjectUuid, subject]) => (
-            <div key={subjectUuid} className="rounded-xl border p-4 w-72">
+            <div key={subjectUuid} className="rounded-2xl p-4 w-72 bg-white shadow-sm ring-1 ring-gray-200">
               <p className="font-semibold">{subject.name}</p>
 
               <div className="mt-2 space-y-2">
@@ -189,8 +189,8 @@ export default function TutorPanel() {
         </div>
       )}
 
-      <div className="rounded-xl border bg-gray-50 p-4">
-        <p className="font-semibold mb-2">Selected object (to send later)</p>
+      <div className="rounded-2xl p-4 bg-white shadow-sm ring-1 ring-gray-200">
+        <p className="font-semibold mb-2 ">Selected object (to send later)</p>
         <pre className="text-sm overflow-auto">{JSON.stringify(selectedForSend, null, 2)}</pre>
       </div>
 

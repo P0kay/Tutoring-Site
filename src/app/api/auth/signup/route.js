@@ -22,7 +22,7 @@ export async function POST(req) {
             [email]
         );
 
-        if (!email || !password || !type || !birth_date) {
+        if (!email || !password || !type || (!birth_date && type === 'tutor')) {
             return NextResponse.json(
                 { message: 'Please provide required information' },
                 { status: 400 }

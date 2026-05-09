@@ -25,6 +25,7 @@ export async function GET(req) {
           ta.is_online
         FROM users u
         JOIN tutor_activity ta ON ta.tutor_uuid = u.uuid
+        JOIN tutor_subject_levels tsl ON tsl.tutor_uuid = u.uuid
         WHERE u.uuid = $1::uuid
           AND u.approved_at IS NOT NULL
           AND u.type IN ('tutor', 'admin')

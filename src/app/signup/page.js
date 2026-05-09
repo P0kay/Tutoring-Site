@@ -1,19 +1,24 @@
 'use client';
 
-import { useState } from "react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 function SignUp() {
     const [error, setError] = useState(null)
+    const [profileType, setProfileType] = useState(null)
 
     async function handleSubmit(e) {
         setError(null)
         e.preventDefault();
         const form = e.target;
-        const email = form.email.value;
+        const type = form.type.value;
+        let birth_date = null
+        if (type === 'tutor') {
+            birth_date = form.birth_date.value;
+        }
         const password = form.password.value;
         const passwordConfirm = form.passwordConfirm.value;
-        const type = form.type.value;
-        const birth_date = form.birth_date.value;
+        const email = form.email.value;
         if (password !== passwordConfirm) {
             setError('Passwords do not match');
             return;
@@ -49,6 +54,9 @@ function SignUp() {
         form.reset();
         window.location.href = '/signed-up';
     }
+    useEffect(() => {
+        console.log(profileType)
+    }, [profileType])
     return (
         <div className="h-min rounded-xl shadow-xl mt-8">
             <form
@@ -88,21 +96,24 @@ function SignUp() {
                         name="type"
                         required
                         className="rounded-lg border border-gray-300 px-4 py-2 bg-white focus:ring-2 focus:ring-blue-500"
+                        onChange={e => setProfileType(e.target.value)}
                     >
                         <option value="">Select type</option>
                         <option value="student">Student</option>
                         <option value="tutor">Tutor</option>
                     </select>
                 </div>
-                <div className="flex flex-col gap-1">
-                    <label className="text-sm text-gray-600">Birth date</label>
-                    <input
-                        type="date"
-                        name="birth_date"
-                        required
-                        className="rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                    />
-                </div>
+                {profileType === 'tutor' &&
+                    <div className="flex flex-col gap-1">
+                        <label className="text-sm text-gray-600">Birth date</label>
+                        <input
+                            type="date"
+                            name="birth_date"
+                            required
+                            className="rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+                }
                 {error && <p className="text-sm text-red-500">{error}</p>}
 
                 <button
@@ -111,6 +122,12 @@ function SignUp() {
                 >
                     Sign up
                 </button>
+                <span className="flex gap-4 text-xs">
+                    <input type="checkbox" required />
+                    <label>
+                        Zapoznałem(-am) się z <Link href='terms-of-service' className="underline">Regulaminem</Link> oraz Polityką prywatności i akceptuję ich postanowienia.
+                    </label>
+                </span>
             </form>
         </div>
     );

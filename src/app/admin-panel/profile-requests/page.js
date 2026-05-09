@@ -87,7 +87,7 @@ async function ProfileRequests() {
                 Profile Pending Requests
             </h1>
 
-            <div className="overflow-hidden rounded-xl border border-slate-300 bg-white shadow-sm">
+            <div className="overflow-hidden rounded-xl border border-slate-300 bg-white shadow-sm mb-16">
                 <div className="overflow-x-auto">
                     <table className="min-w-full border-collapse">
                         <thead className="sticky top-0 bg-slate-50">

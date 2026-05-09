@@ -7,6 +7,7 @@ function TutorProfile() {
     const searchParams = useSearchParams()
     const tutorUuid = searchParams.get("tutor")
     const [tutor, setTutor] = useState(null)
+    const [tutorPrice, setTutorPrice] = useState(null)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
 
@@ -34,19 +35,36 @@ function TutorProfile() {
                     }
                 )
 
-                const data = await res.json()
-
+                let data = await res.json()
                 if (!res.ok) {
                     throw new Error(data.message || 'Failed to load tutor profile')
                 }
 
                 if (!cancelled) {
                     setTutor(data.tutor ?? null)
-                    console.log(data.tutor)
                 }
+
+                const res2 = await fetch(
+                    `/api/user/get-tutor-price?tutor=${encodeURIComponent(tutorUuid)}`,
+                    {
+                        method: 'GET',
+                        credentials: 'include',
+                        cache: 'no-store',
+                    }
+                )
+
+                data = await res2.json()
+                if (!res2.ok) {
+                    throw new Error(data.message || 'Failed to load tutor prices')
+                }
+                if (!cancelled) {
+                    setTutorPrice(data.tutorPrice ?? null)
+                }
+
             } catch (err) {
                 if (!cancelled) {
                     setTutor(null)
+                    setTutorPrice(null)
                     setError(err.message)
                 }
             } finally {
@@ -125,6 +143,33 @@ function TutorProfile() {
                         {tutor.is_online ? "Online now" : "Offline"}
                     </div>
                 </div>
+                {tutorPrice && tutorPrice.length > 0 && (
+                    <div className="flex flex-col gap-4 mt-4">
+                        <h3 className="text-lg font-semibold text-slate-900">Price</h3>
+                        {console.log(tutorPrice)}
+                        <div className="grid gap-3">
+                            {Object.entries(
+                                tutorPrice.reduce((acc, { key, price, level }) => {
+                                    if (!acc[key]) acc[key] = {};
+                                    acc[key][level] = price;
+                                    return acc;
+                                }, {})
+                            ).map(([subject, levels]) => (
+                                <div key={subject} className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                                    <h4 className="font-medium text-slate-900">{subject}</h4>
+                                    <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                                        {Object.entries(levels).map(([level, price]) => (
+                                            <div key={level} className="flex items-center justify-between rounded-md bg-white px-3 py-2 shadow-sm">
+                                                <span className="text-sm font-medium text-slate-700 capitalize">{level}</span>
+                                                <span className="text-sm font-semibold text-slate-900">{price} zł/h</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 <div className="grid gap-6 pt-6 md:grid-cols-[minmax(0,1.3fr)_minmax(260px,0.7fr)]">
                     <div>
